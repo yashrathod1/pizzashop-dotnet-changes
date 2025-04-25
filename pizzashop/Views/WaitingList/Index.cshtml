@@ -1,0 +1,80 @@
+@model pizzashop_repository.ViewModels.WaitingListViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout_OrderApp.cshtml";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/kot.css">
+</head>
+
+<div class="container-fluid p-sm-0">
+    <div class="d-flex justify-content-between m-3">
+        <div class="h4 blue-color text-center text-md-start m-md-3"><strong>Waiting List</strong></div>
+        <div class="d-flex align-items-center"><button class="btn wait-token-btn  cancel-btn-color"
+                data-bs-target="#WaitingToken" data-bs-toggle="modal" >+ WaitingToken</button></div>
+    </div>
+
+
+    <!-- Tabs -->
+    <div class="tabs-wrapper bg-white  m-md-3 shadow-box pt-2 ps-2">
+        <ul class="nav nav-tabs flex-column flex-sm-row " role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button"
+                    data-id="null" role="tab">
+                    <strong>All</strong>
+                </button>
+            </li>
+            @foreach (var sections in Model.Sections)
+            {
+                var tabId = $"tab-{sections.Id}";
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#@tabId" type="button"
+                        data-id="@sections.Id" role="tab">
+                        <strong class="text-muted">@sections.Name</strong>
+                    </button>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Sections Tabs -->
+
+    <div class="tab-content bg-white mt-3 m-md-3 shadow-box" style="overflow-y: auto; height: 600px;">
+        <div class="tab-pane fade show active" id="all" role="tabpanel">
+            <div class="p-3">
+                <div id="waitingListContainer">
+
+                </div>
+            </div>
+        </div>
+
+        @foreach (var sections in Model.Sections)
+        {
+            var tabId = $"tab-{sections.Id}";
+            <div class="tab-pane fade" id="@tabId" role="tabpanel">
+                <div class="p-3">
+                    <div id="waitingListContainer-@sections.Id">
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>
+
+
+
+@* Waiting token model *@
+<!-- Modal -->
+<div class="modal fade" id="WaitingToken" tabindex="-1">
+    @await Html.PartialAsync("_WaitingTokenModalPartial", Model.WaitingTokens);
+</div>
+
+@* modal for edit *@
+<div class="modal fade" id="editWaitingToken" tabindex="-1">
+    @await Html.PartialAsync("_WaitingTokenModalPartial", Model.WaitingTokens);
+</div>
+
+<script src="~/js/waitinglistview.js"></script>

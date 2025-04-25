@@ -1,0 +1,18 @@
+using pizzashop_repository.ViewModels;
+
+namespace pizzashop_service.Interface;
+
+public interface IWaitingListService
+{ 
+    Task<WaitingListViewModel> GetSectionAsync();
+
+    Task<List<OrderAppSectionViewModel>> GetAllSectionsAsync();
+
+    Task<WaitingListViewModel> GetWaitingListAsync(int? sectionId);
+
+    Task<bool> AddWaitingTokenInWaitingListAsync(WaitingTokenViewModel waitingTokenVm);
+
+    Task<CustomerViewModel?> GetCustomerByEmail(string email);
+
+    Task<WaitingListItemViewModel?> GetTokenByIdAsync(int id);
+}   
