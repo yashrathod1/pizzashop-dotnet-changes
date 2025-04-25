@@ -18,151 +18,234 @@ public class UserRepository : IUserRepository
 
     public User? GetUserByEmail(string email)
     {
-        return _context.Users.FirstOrDefault(u => u.Email == email);
+        try
+        {
+            return _context.Users.FirstOrDefault(u => u.Email == email);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Error getting user by emial", ex);
+        }
+
     }
 
     public User? GetUserByUsername(string username)
     {
-        return _context.Users.FirstOrDefault(u => u.Username == username);
+        try
+        {
+            return _context.Users.FirstOrDefault(u => u.Username == username);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Error geting user by name", ex);
+        }
     }
 
-    public User GetUserByResetToken(string token)
+    public User? GetUserByResetToken(string token)
     {
-        return _context.Users.FirstOrDefault(u => u.PasswordResetToken == token);
+        try
+        {
+            return _context.Users.FirstOrDefault(u => u.PasswordResetToken == token);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Error getting user", ex);
+        }
+
     }
 
 
     public bool UpdateUser(User user)
     {
-        _context.Users.Update(user);
-        _context.SaveChanges();
-        return true;
+        try
+        {
+            _context.Users.Update(user);
+            _context.SaveChanges();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Failed To Update User", ex);
+        }
     }
 
     public async Task<string?> GetUserRole(int roleId)
     {
-        return await _context.Roles.Where(r => r.Id == roleId).Select(r => r.Rolename).FirstOrDefaultAsync();
+        try
+        {
+            return await _context.Roles.Where(r => r.Id == roleId).Select(r => r.Rolename).FirstOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Failed to get user role", ex);
+        }
     }
 
     public User? GetUserByEmailAndRole(string email)
     {
-        return _context.Users
+        try
+        {
+            return _context.Users
                .Include(u => u.Role)
                .FirstOrDefault(u => u.Email == email);
-    }
-
-    public async Task<PagedResult<UserTableViewModel>> GetUsersAsync(int pageNumber, int pageSize, string sortBy, string sortOrder, string searchTerm = "")
-    {
-        IQueryable<User>? query = _context.Users.Include(u => u.Role).Where(u => !u.Isdeleted).AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        }
+        catch (Exception ex)
         {
-            query = query.Where(i => i.Firstname.ToLower().Contains(searchTerm.ToLower()) || i.Lastname.ToLower().Contains(searchTerm.ToLower()));
+            throw new ApplicationException("Failed to get user email and role", ex);
         }
 
-
-        query = sortBy switch
-        {
-            "Name" => sortOrder == "asc"
-                ? query.OrderBy(u => u.Firstname)
-                : query.OrderByDescending(u => u.Firstname),
-
-            "Role" => sortOrder == "asc"
-                ? query.OrderBy(u => u.Role.Rolename)
-                : query.OrderByDescending(u => u.Role.Rolename),
-
-            _ => query.OrderBy(u => u.Id) // Default sorting by ID
-        };
-
-        int totalCount = await query.CountAsync();
-
-        List<UserTableViewModel>? users = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .Select(t => new UserTableViewModel
-            {
-                Id = t.Id,
-                Firstname = t.Firstname,
-                Lastname = t.Lastname,
-                Email = t.Email,
-                Phone = t.Phone,
-                Rolename = t.Role.Rolename,
-                Status = t.Status,
-                ProfileImagePath = t.Profileimagepath
-            }).ToListAsync();
-
-        return new PagedResult<UserTableViewModel>(users, pageNumber, pageSize, totalCount);
     }
 
-    public User? GetUserById(int? id)
+    public async Task<IQueryable<User>> GetAllUsersWithRolesAsync()
     {
-        return _context.Users.FirstOrDefault(u => u.Id == id);
+        try
+        {
+            var users = _context.Users
+                .Include(u => u.Role)
+                .Where(u => !u.Isdeleted)
+                .AsQueryable();
+
+            return await Task.FromResult(users);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Failed to get users from database", ex);
+        }
     }
+
+    public User? GetUserById(int id)
+    {
+        try
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == id);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving the user by id.", ex);
+        }
+    }
+
+
 
     public void SoftDeleteUser(User user)
     {
-        user.Isdeleted = true;
-        _context.SaveChanges();
+        try
+        {
+            user.Isdeleted = true;
+            _context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("Error in Deleting User", ex);
+        }
     }
 
     public List<Role> GetRoles()
     {
-        return _context.Roles.ToList();
+        try
+        {
+            return _context.Roles.ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving the roles.", ex);
+        }
     }
+
 
     public Role GetRoleById(int id)
     {
-        return _context.Roles.FirstOrDefault(r => r.Id == id);
+        try
+        {
+            var role = _context.Roles.FirstOrDefault(r => r.Id == id);
+            if (role == null)
+            {
+                throw new KeyNotFoundException("Role not found.");
+            }
+            return role;
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving the role by ID.", ex);
+        }
     }
 
     public void AddUser(User user)
     {
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        try
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while adding the user.", ex);
+        }
     }
 
     public User? GetUserByIdAndRole(int id)
     {
-        return _context.Users.Include(u => u.Role).FirstOrDefault(u => u.Id == id);
-    }
-
-    public async Task<List<RolePermissionViewModel>> GetPermissionsByRoleAsync(string roleName)
-    {
-        Role? role = await _context.Roles.FirstOrDefaultAsync(r => r.Rolename == roleName);
-        List<RolePermissionViewModel>? permissions = await _context.Roleandpermissions
-            .Where(rp => rp.Roleid == role.Id)
-            .Select(rp => new RolePermissionViewModel
-            {
-                Permissionid = rp.Permissionid,
-                PermissionName = rp.Permission.Permissiomname, // Ensure you have a navigation property
-                Canview = rp.Canview,
-                CanaddEdit = rp.CanaddEdit,
-                Candelete = rp.Candelete
-            })
-            .ToListAsync();
-
-        return permissions;
-    }
-
-
-    public async Task<bool> UpdateRolePermissionsAsync(List<RolePermissionViewModel> permissions)
-    {
-        foreach (RolePermissionViewModel? permission in permissions)
+        try
         {
-            Roleandpermission? rolePermission = await _context.Roleandpermissions
-                .FirstOrDefaultAsync(rp => rp.Role.Rolename == permission.Roleid && rp.Permissionid == permission.Permissionid);
-
-            if (rolePermission != null)
-            {
-                rolePermission.Canview = permission.Canview;
-                rolePermission.CanaddEdit = permission.CanaddEdit;
-                rolePermission.Candelete = permission.Candelete;
-            }
+            return _context.Users.Include(u => u.Role).FirstOrDefault(u => u.Id == id);
         }
-
-        await _context.SaveChangesAsync();
-        return true;
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving the user by ID and role.", ex);
+        }
     }
 
 
+    public async Task<Role?> GetRoleByNameAsync(string roleName)
+    {
+        try
+        {
+            return await _context.Roles.FirstOrDefaultAsync(r => r.Rolename == roleName);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving the role by name.", ex);
+        }
+    }
+
+    public async Task<List<Roleandpermission>> GetRolePermissionsByRoleIdAsync(int roleId)
+    {
+        try
+        {
+            return await _context.Roleandpermissions.Include(rp => rp.Permission)
+                .Where(rp => rp.Roleid == roleId)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving permissions by role ID.", ex);
+        }
+    }
+
+
+    public async Task<Roleandpermission?> GetRolePermissionByRoleAndPermissionAsync(string? roleName, int? permissionId)
+    {
+        try
+        {
+            return await _context.Roleandpermissions
+                .FirstOrDefaultAsync(rp => rp.Role.Rolename == roleName && rp.Permissionid == permissionId);
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while retrieving role permission by role name and permission id.", ex);
+        }
+    }
+
+    public async Task UpdateRolePermissionAsync(Roleandpermission rolePermission)
+    {
+        try
+        {
+            _context.Roleandpermissions.Update(rolePermission);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new ApplicationException("An error occurred while updating the role permission.", ex);
+        }
+    }
 }

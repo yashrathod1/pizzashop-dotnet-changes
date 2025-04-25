@@ -16,7 +16,7 @@ public class DashboardController : Controller
     }
 
     public IActionResult Index()
-    {   
+    {
         ViewBag.ActiveNav = "Dashboard";
         return View();
     }
@@ -24,57 +24,75 @@ public class DashboardController : Controller
     [HttpGet]
     public IActionResult Profile()
     {
-        string? token = Request.Cookies["AuthToken"];
-        string? email = _useService.ExtractEmailFromToken(token);
-
-        if (string.IsNullOrEmpty(email))
+        try
         {
+            string? token = Request.Cookies["AuthToken"];
+            string? email = _useService.ExtractEmailFromToken(token);
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            UserTableViewModel? model = _useService.GetUserProfile(email);
+
+            if (model == null)
+            {
+                return NotFound("User Not Found");
+            }
+
+            ViewBag.Email = email;
+            return View(model);
+        }
+        catch 
+        {
+            TempData["error"] = "An error occurred while fetching the profile.";
             return RedirectToAction("Login", "Login");
         }
-
-        UserTableViewModel? model = _useService.GetUserProfile(email);
-
-        if (model == null)
-        {
-            return NotFound("User Not Found");
-        }
-
-        ViewBag.Email = email;
-        return View(model);
     }
+
 
     [HttpPost]
     public IActionResult Profile(UserTableViewModel model)
     {
-        string? token = Request.Cookies["AuthToken"];
-        string? email = _useService.ExtractEmailFromToken(token);
-
-        if (string.IsNullOrEmpty(email))
+        try
         {
-            return RedirectToAction("Login", "Login");
-        }
+            string? token = Request.Cookies["AuthToken"];
+            string? email = _useService.ExtractEmailFromToken(token);
 
-        bool success = _useService.UpdateUserProfile(email, model);
+            if (string.IsNullOrEmpty(email))
+            {
+                return RedirectToAction("Login", "Login");
+            }
 
-        CookieOptions? coockieopt = new CookieOptions
+            bool success = _useService.UpdateUserProfile(email, model);
+
+            CookieOptions? coockieopt = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             };
 
-        Response.Cookies.Append("Username", model.Username, coockieopt);
-        Response.Cookies.Append("ProfileImgPath", string.IsNullOrEmpty(model.ProfileImagePath) ? "/images/Default_pfp.svg.png" : model.ProfileImagePath, coockieopt);
+            Response.Cookies.Append("Username", model.Username, coockieopt);
+            Response.Cookies.Append("ProfileImgPath", string.IsNullOrEmpty(model.ProfileImagePath) ? "/images/Default_pfp.svg.png" : model.ProfileImagePath, coockieopt);
 
+            if (!success)
+            {
+                return NotFound("User Not Found");
+            }
 
-        if (!success)
-        {
-            return NotFound("User Not Found");
+            TempData["success"] = "Profile updated successfully.";
+            return View(model);
         }
+        catch (Exception ex)
+        {
+            TempData["error"] = "An error occurred while updating the profile.";
+            return RedirectToAction("Profile");
 
-        TempData["success"] = "Profile updated successfully.";
-        return View(model);
+        }
     }
+
 
     [HttpGet]
     public IActionResult ChangePassword()
@@ -85,31 +103,40 @@ public class DashboardController : Controller
     [HttpPost]
     public IActionResult ChangePassword(ChangePasswordViewModel model)
     {
-        string? token = Request.Cookies["AuthToken"];
-        string? userEmail = _useService.ExtractEmailFromToken(token);
-
-        if (string.IsNullOrEmpty(userEmail))
+        try
         {
+            string? token = Request.Cookies["AuthToken"];
+            string? userEmail = _useService.ExtractEmailFromToken(token);
+
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return RedirectToAction("Login", "Login");
+            }
+
+            string? result = _useService.ChangePassword(userEmail, model);
+
+            if (result == "UserNotFound")
+            {
+                TempData["error"] = "User not found.";
+                return View(model);
+            }
+
+            if (result == "IncorrectPassword")
+            {
+                TempData["error"] = "Current password is incorrect.";
+                return View(model);
+            }
+
+            TempData["success"] = "Password updated successfully.";
             return RedirectToAction("Login", "Login");
         }
-
-        string? result = _useService.ChangePassword(userEmail, model);
-
-        if (result == "UserNotFound")
+        catch (Exception)
         {
-            TempData["error"] = "User not found.";
+            TempData["error"] = "An unexpected error occurred.";
             return View(model);
         }
-
-        if (result == "IncorrectPassword")
-        {
-            TempData["error"] = "Current password is incorrect.";
-            return View(model);
-        }
-
-        TempData["success"] = "Password updated successfully.";
-        return RedirectToAction("Login", "Login"); ;
     }
+
 
     public IActionResult Logout()
     {

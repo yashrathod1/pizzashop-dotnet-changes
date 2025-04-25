@@ -18,9 +18,8 @@ public interface IUserRepository
 
     User? GetUserByEmailAndRole(string email);
 
-    Task<PagedResult<UserTableViewModel>> GetUsersAsync(int pageNumber, int pageSize, string sortBy, string sortOrder, string searchTerm = "");
-
-    User GetUserById(int? id);
+    Task<IQueryable<User>> GetAllUsersWithRolesAsync();
+    User GetUserById(int id);
 
     void SoftDeleteUser(User user);
 
@@ -31,9 +30,13 @@ public interface IUserRepository
 
     User? GetUserByIdAndRole(int id);
 
-    Task<List<RolePermissionViewModel>> GetPermissionsByRoleAsync(string roleName);
+    Task<Role?> GetRoleByNameAsync(string roleName);
 
-    Task<bool> UpdateRolePermissionsAsync(List<RolePermissionViewModel> permissions);
+    Task<List<Roleandpermission>> GetRolePermissionsByRoleIdAsync(int roleId);
+
+    Task<Roleandpermission?> GetRolePermissionByRoleAndPermissionAsync(string? roleName, int? permissionId);
+
+    Task UpdateRolePermissionAsync(Roleandpermission rolePermission);
 
 
 
