@@ -19,7 +19,7 @@ public interface IMenuService
 
     Task<bool> SoftDeleteCategoryAsync(int id);
 
-    Task<List<ItemViewModel>> GetItemsByCategoryAsync(int categoryId);
+    // Task<List<ItemViewModel>> GetItemsByCategoryAsync(int categoryId);
 
     Task<bool> AddItemAsync(ItemViewModel model);
 
@@ -27,13 +27,13 @@ public interface IMenuService
 
     Task<bool> SoftDeleteItemAsync(int id);
 
-    void SoftDeleteItemsAsync(List<int> itemIds);
+    void SoftDeleteItems(List<int> itemIds);
 
     ItemViewModel GetItemById(int id);
 
     Task<List<ModifierGroupViewModel>> GetModifierGroupAsync();
 
-    Task<PagedResult<ModifierViewModel>> GetModifiersByModifierGroupAsync(int modifierGroupId, int pageNumber, int pageSize, string searchTerm="");
+    Task<PagedResult<ModifierViewModel>> GetModifiersByModifierGroupAsync(int modifierGroupId, int pageNumber, int pageSize, string searchTerm = "");
 
     Task<List<ModifierViewModel>> GetModifiersAsync();
 
@@ -41,15 +41,13 @@ public interface IMenuService
 
     Task<bool> SoftDeleteModifierGroupAsync(int id);
 
-    ModifierGroupViewModel GetModifierGroupById(int id);
+    Task<ModifierGroupViewModel> GetModifierGroupById(int id);
 
     Task<bool> UpdateModifierGroup(ModifierGroupViewModel model);
-    
-    
 
     Task<bool> AddModifierAsync(ModifierViewModel model);
 
-    ModifierViewModel GetModifierById(int id);
+    Task<ModifierViewModel> GetModifierById(int id);
 
     Task<bool> UpdateModifierAsync(ModifierViewModel model);
 
@@ -59,8 +57,7 @@ public interface IMenuService
 
     Task<bool> SoftDeleteModifiersAsync(List<int> modifierIds, int currentGroupId);
 
-    Task<PagedResult<ItemViewModel>> GetItemsByCategoryAsync(int categoryId, int pageNumber, int pageSize, string searchTerm="");
-
+    Task<PagedResult<ItemViewModel>> GetItemsByCategoryAsync(int categoryId, int pageNumber, int pageSize, string searchTerm = "");
     Task<PagedResult<ModifierViewModel>> GetAllModifiersToAddModifierGroupAsync(int pageNumber, int pageSize, string searchTerm = "");
 
     Task<ModifierGroupViewModel?> GetModifiersByGroupIdAsync(int modifierGroupId);

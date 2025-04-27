@@ -73,6 +73,12 @@ public class MenuController : Controller
         return Json(categories);
     }
 
+    public async Task<IActionResult> GetModifierGroupForModal()
+    {
+        List<ModifierGroupViewModel>? modifiergroup = await _menuService.GetModifierGroupAsync();
+        return Json(modifiergroup);
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddCategory([FromBody] CategoryViewModel model)
     {
@@ -89,7 +95,7 @@ public class MenuController : Controller
 
         string? userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Unknown";
         var category = await _menuService.AddCategoryAsync(model.Name, model.Description, userRole);
-        return Json(new { success = true, category });
+        return Json(new { success = true, message = "Category added successfully" });
     }
 
     [HttpPut]
@@ -276,7 +282,7 @@ public class MenuController : Controller
             return Json(new { success = false, message = "No item Selected" });
         }
 
-        _menuService.SoftDeleteItemsAsync(itemIds);
+        _menuService.SoftDeleteItems(itemIds);
         return Json(new { success = true });
     }
 
@@ -333,9 +339,9 @@ public class MenuController : Controller
     }
 
     [HttpGet]
-    public IActionResult GetModifierGroupById(int id)
+    public async Task<IActionResult> GetModifierGroupById(int id)
     {
-        ModifierGroupViewModel? model = _menuService.GetModifierGroupById(id);
+        ModifierGroupViewModel? model = await _menuService.GetModifierGroupById(id);
         if (model != null)
         {
             return Json(model);
@@ -381,9 +387,9 @@ public class MenuController : Controller
     }
 
     [HttpGet]
-    public IActionResult GetModifierById(int id)
+    public async Task<IActionResult> GetModifierById(int id)
     {
-        ModifierViewModel? modifier = _menuService.GetModifierById(id);
+        ModifierViewModel? modifier = await _menuService.GetModifierById(id);
         if (modifier == null)
         {
             return NotFound();

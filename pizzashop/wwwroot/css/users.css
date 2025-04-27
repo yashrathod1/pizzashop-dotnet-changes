@@ -45,10 +45,10 @@ body {
 }
 
 
-.modal-backdrop.show {
+/* .modal-backdrop.show {
     opacity: 0;
     width: 0;
-}
+} */
 
 .modal-footer {
     border-top: none;
@@ -79,9 +79,9 @@ body {
     color: #0568a8;
 }
 
-.modal-backdrop.show {
+/* .modal-backdrop.show {
     opacity: 0;
-}
+} */
 
 .sidebar-name {
     color: #7e8696;

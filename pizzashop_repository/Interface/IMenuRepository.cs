@@ -5,20 +5,22 @@ namespace pizzashop_repository.Interface;
 
 public interface IMenuRepository
 {
-    Task<List<CategoryViewModel>> GetCategoriesAsync();
+    Task<List<Category>> GetCategoriesAsync();
 
-    Task<List<ItemViewModel>> GetItemsAsync();
+    Task<List<MenuItem>> GetItemsAsync();
     Task<Category> AddCategoryAsync(Category category);
 
     Task<Category?> GetCategoryByNameAsync(string name);
 
-    Task<bool> UpdateCategoryAsync(Category category, string Updatedby);
-
     Task<Category?> GetCategoryByIdAsync(int id);
 
-    Task<bool> SoftDeleteCategoryAsync(int id);
+    Task<bool> UpdateCategoryAsync(Category category);
 
-    Task<List<ItemViewModel>> GetItemsByCategoryAsync(int categoryId);
+    // Task<Category?> GetCategoryByIdAsync(int id);
+
+    Task<bool> SoftDeleteCategoryAsync(Category category);
+
+    // Task<IQueryable<MenuItem>> GetItemsByCategoryQueryAsync(int categoryId);
 
     Task<bool> AddItemAsync(MenuItem item);
 
@@ -34,13 +36,15 @@ public interface IMenuRepository
 
     void SoftDeleteItemsAsync(List<int> itemIds);
 
-    ItemViewModel GetItemById(int id);
+    List<MappingMenuItemWithModifier> GetItemModifiersByItemId(int itemId);
 
-    Task<List<ModifierGroupViewModel>> GetModifierGroupAsync();
+    Task<List<Modifiergroup>> GetModifierGroupsAsync();
 
-    Task<PagedResult<ModifierViewModel>> GetModifiersByModifierGroupAsync(int modifierGroupId, int pageNumber, int pageSize, string searchTerm = " ");
+    Task<IQueryable<Modifier>> GetModifiersByModifierGroupQueryAsync(int modifierGroupId);
 
-    Task<List<ModifierViewModel>> GetModifiersAsync();
+    Task<List<Modifier>> GetModifiersAsync();
+
+    Task<List<int>> GetModifierGroupIdsForModifierAsync(int modifierId);
 
     Task<bool> AddModifierGroup(Modifiergroup modifierGroup, List<int> modifierIds);
 
@@ -48,15 +52,17 @@ public interface IMenuRepository
 
     Task<bool> SoftDeleteModifierGroupAsync(int id);
 
-    ModifierGroupViewModel GetModifierGroupById(int id);
+    Task<Modifiergroup?> GetModifierGroupByIdAsync(int id);
 
     Task<bool> UpdateModifierGroup(ModifierGroupViewModel model);
 
-    Task<Modifiergroup?> GetModifierGorupByIdAsync(int id);
+    // Task<Modifiergroup?> GetModifierGorupByIdAsync(int id);
 
-    Task<bool> AddModifierAsync(ModifierViewModel model);
+    Task<bool> AddModifierAsync(Modifier modifier, List<int> modifierGroupIds);
 
-    ModifierViewModel GetModifierById(int id);
+    Task<Modifier?> GetModifierById(int id);
+
+    // List<int> GetModifierGroupIdsByModifierId(int modifierId);
 
     Task<bool> UpdateModifierAsync(Modifier modifie);
 
@@ -70,7 +76,7 @@ public interface IMenuRepository
 
     Task<bool> SoftDeleteModifiersAsync(List<int> modifierIds, int currentGroupId);
 
-    Task<PagedResult<ItemViewModel>> GetItemsByCategoryAsync(int categoryId, int pageNumber, int pageSize, string searchTerm = "");
+    Task<IQueryable<MenuItem>> GetItemsByCategoryQueryAsync(int categoryId);
 
     Task<PagedResult<ModifierViewModel>> GetAllModifiersToAddModifierGroupAsync(int pageNumber, int pageSize, string searchTerm = "");
 

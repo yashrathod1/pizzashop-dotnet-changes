@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     loadCategories();
 
     loadModifiers(1);
@@ -90,7 +89,7 @@ function updateCategory() {
                 toastr.success(response.message);
                 $("#categoryModal").modal("hide");
                 $("#categoryname, #categorydescription").val("");
-                $("#saveCategoryBtn").data("edit-mode", false).removeData("category-id");
+                $("#addEditCategoryForm").removeData("edit-mode").removeData("category-id");
                 loadCategories();
             } else {
                 toastr.error(response.message);
@@ -167,16 +166,17 @@ $(document).on("click", ".category-item", function (event) {
 });
 
 
-$('#categoryModal').on('hidden.bs.modal', function () {
+$(document).on('hidden.bs.modal','#categoryModal', function () {
     $("#categoryname").val('');
     $("#categorydescription").val('');
-    $("#saveCategoryBtn").removeData("edit-mode").removeData("category-id");
+    $("#editCategoryId").val('');
+    $("#addEditCategoryForm").removeData("edit-mode").removeData("category-id");
 });
 
 $(document).on("click", "[data-bs-target='#categoryModal']", function () {
     $("#categoryname").val('');
     $("#categorydescription").val('');
-    $("#saveCategoryBtn").removeData("edit-mode").removeData("category-id");
+    $("#addEditCategoryForm").removeData("edit-mode").removeData("category-id");
 });
 
 
@@ -684,6 +684,10 @@ $(document).on("click", ".modifiergroup-item", function (event) {
 // });
 
 
+
+
+
+
 $("#addModifierGroupForm").on("submit", function (e) {
     e.preventDefault();
 
@@ -996,7 +1000,42 @@ $(document).on('hidden.bs.modal', '#addModifierModal', function () {
 
 });
 
+// dropdown for add
+$(document).on("click", ".new-modifier", function (e) {
+    e.preventDefault();
 
+    $("#modifierDropdownList").html('<li class="dropdown-item text-center">Loading...</li>');
+
+    $.ajax({
+        url: '/Menu/GetModifierGroupForModal',
+        type: 'GET',
+        success: function (response) {
+            let dropdownHtml = `
+                <li>
+                    <label class="dropdown-item">
+                        <input type="checkbox" id="selectAll">
+                        <strong>Select All</strong>
+                    </label>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+            `;
+            response.forEach(function (modifierGroup) {
+                dropdownHtml += `
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="modifier-checkbox" value="${modifierGroup.id}">
+                            ${modifierGroup.name}
+                        </label>
+                    </li>
+                `;
+            });
+            $("#modifierDropdownList").html(dropdownHtml);
+        },
+        error: function () {
+            toastr.error("Failed to load modifier groups.");
+        }
+    });
+});
 
 // @* add modifires  *@
 $("#AddModifierForm").submit(function (event) {
@@ -1061,11 +1100,42 @@ $("#AddModifierForm").submit(function (event) {
 });
 
 
-
 // @* updatemodifier *@
 
 $(document).on("click", ".edit-modifier", function () {
     let modifierId = $(this).data("id");
+
+    $.ajax({
+        url: '/Menu/GetModifierGroupForModal', 
+        type: 'GET',
+        success: function (modifierGroups) {
+            let dropdownHtml = `
+                <li>
+                    <label class="dropdown-item">
+                        <input type="checkbox" id="selectAll">
+                        <strong>Select All</strong>
+                    </label>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+            `;
+
+            modifierGroups.forEach(function (group) {
+                dropdownHtml += `
+                    <li>
+                        <label class="dropdown-item">
+                            <input type="checkbox" class="edit-modifier-checkbox" value="${group.id}">
+                            ${group.name}
+                        </label>
+                    </li>
+                `;
+            });
+
+            $(".dropdown-menu").html(dropdownHtml);
+        },
+        error: function () {
+            toastr.error("Failed to load modifier groups.");
+        }
+    });
 
     $.ajax({
         url: '/Menu/GetModifierById',
@@ -1089,7 +1159,6 @@ $(document).on("click", ".edit-modifier", function () {
                 });
             }
 
-
             $("#EditModifiersModal").modal('show');
         },
         error: function () {
@@ -1097,6 +1166,7 @@ $(document).on("click", ".edit-modifier", function () {
         }
     });
 });
+
 
 
 // @*   updatemodifier *@
@@ -1120,7 +1190,7 @@ $("#EditModifierForm").submit(function (e) {
 
     let formData = {
         Id: $("#modifierId").val(),
-        ModifierGroupIds: selectedModifierGroups1,  // Send checked group IDs
+        ModifierGroupIds: selectedModifierGroups1,
         Name: $("#Name2").val(),
         Price: parseFloat($("#Rate2").val()),
         Quantity: parseInt($("#Quantity2").val(), 10),

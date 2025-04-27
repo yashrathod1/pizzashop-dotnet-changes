@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -17,15 +18,13 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;
 
-    private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    private readonly PizzaShopDbContext _context;
-    public UserService(IUserRepository userRepository, IJwtService jwtService, PizzaShopDbContext context, IConfiguration configuration)
+    public UserService(IUserRepository userRepository, IJwtService jwtService, IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _jwtService = jwtService;
-        _context = context;
-        _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
 
     }
 
@@ -37,7 +36,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the user by email.", ex);
+            throw new Exception("An error occurred while retrieving the user by email.", ex);
         }
     }
 
@@ -50,7 +49,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the user by username.", ex);
+            throw new Exception("An error occurred while retrieving the user by username.", ex);
         }
     }
 
@@ -81,7 +80,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while authenticating the user.", ex);
+            throw new Exception("An error occurred while authenticating the user.", ex);
         }
     }
 
@@ -93,7 +92,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while generating the JWT token.", ex);
+            throw new Exception("An error occurred while generating the JWT token.", ex);
         }
     }
 
@@ -114,7 +113,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while generating the password reset token.", ex);
+            throw new Exception("An error occurred while generating the password reset token.", ex);
         }
     }
 
@@ -248,6 +247,14 @@ public class UserService : IUserService
 
             model.ProfileImagePath = user.Profileimagepath;
 
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null)
+            {
+                context.Response.Cookies.Append("Username", model.Username);
+                context.Response.Cookies.Append("ProfileImgPath", model.ProfileImagePath);
+            }
+
+
             return _userRepository.UpdateUser(user);
         }
         catch
@@ -279,7 +286,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("change password error occurs", ex);
+            throw new Exception("change password error occurs", ex);
         }
     }
 
@@ -333,7 +340,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Failed to fetch paginated users", ex);
+            throw new Exception("Failed to fetch paginated users", ex);
         }
     }
 
@@ -353,7 +360,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException($"Error occurred while deleting user with ID: {id}", ex);
+            throw new Exception($"Error occurred while deleting user with ID: {id}", ex);
         }
     }
 
@@ -366,7 +373,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error occurred while retrieving roles.", ex);
+            throw new Exception("Error occurred while retrieving roles.", ex);
         }
     }
 
@@ -425,7 +432,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error occurred while adding a user.", ex);
+            throw new Exception("Error occurred while adding a user.", ex);
         }
     }
 
@@ -457,7 +464,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error occurred while fetching user for edit.", ex);
+            throw new Exception("Error occurred while fetching user for edit.", ex);
         }
     }
 
@@ -546,7 +553,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error occurred while editing the user profile.", ex);
+            throw new Exception("Error occurred while editing the user profile.", ex);
         }
     }
 
@@ -558,7 +565,7 @@ public class UserService : IUserService
             var role = await _userRepository.GetRoleByNameAsync(roleName);
             if (role == null)
             {
-                throw new ApplicationException($"Role with name {roleName} not found.");
+                throw new Exception($"Role with name {roleName} not found.");
             }
 
             var rolePermissions = await _userRepository.GetRolePermissionsByRoleIdAsync(role.Id);
@@ -574,9 +581,9 @@ public class UserService : IUserService
 
             return permissions;
         }
-        catch (Exception ex)
+        catch
         {
-            throw new ApplicationException("An error occurred while retrieving permissions for the role.", ex);
+            throw;
         }
     }
 
@@ -602,7 +609,7 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while updating role permissions.", ex);
+            throw new Exception("An error occurred while updating role permissions.", ex);
         }
     }
 }

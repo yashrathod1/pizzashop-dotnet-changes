@@ -9,6 +9,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.4" />
     <PackageReference Include="MimeKit" Version="4.10.0" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="24.1.0" />
+    <Folder Include="Interface\" />
+    <Folder Include="Implementation\" />
   </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>

@@ -457,7 +457,7 @@
                             @if (perms?.CanaddEdit == true)
                             {
                             <div class="ms-4"><button type="button" data-bs-toggle="modal"
-                                    data-bs-target="#addModifierModal" class="btn menu-new-item-btn text-white">+New
+                                    data-bs-target="#addModifierModal" class="btn menu-new-item-btn new-modifier text-white">+New
                                     Modifier</button>
                             </div>
                             }
@@ -484,7 +484,7 @@
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 Select Modifier Group(s)
                                                             </button>
-                                                            <ul class="dropdown-menu w-100"
+                                                            @* <ul class="dropdown-menu w-100"
                                                                 aria-labelledby="modifierDropdown">
                                                                 <li>
                                                                     <label class="dropdown-item">
@@ -505,7 +505,10 @@
                                                                         </label>
                                                                     </li>
                                                                 }
-                                                            </ul>
+                                                            </ul> *@
+                                                            <ul class="dropdown-menu w-100" id="modifierDropdownList" aria-labelledby="modifierDropdown">
+                                                            <!-- Dropdown content will be dynamically loaded here -->
+                                                                 </ul>
                                                         </div>
                                                         <input type="hidden" id="ModifierGroupIds"
                                                             name="ModifierGroupIds">
@@ -601,28 +604,8 @@
                                                                 data-bs-toggle="dropdown" aria-expanded="false">
                                                                 Select Modifier Group(s)
                                                             </button>
-                                                            <ul class="dropdown-menu w-100"
-                                                                aria-labelledby="modifierDropdown">
-                                                                <li>
-                                                                    <label class="dropdown-item">
-                                                                        <input type="checkbox" id="selectAll">
-                                                                        <strong>Select All</strong>
-                                                                    </label>
-                                                                </li>
-                                                                <li>
-                                                                    <hr class="dropdown-divider">
-                                                                </li>
-                                                                @foreach (var modifierGroup in Model.ModifierGroup)
-                                                                {
-                                                                    <li>
-                                                                        <label class="dropdown-item">
-                                                                            <input type="checkbox"
-                                                                                class="edit-modifier-checkbox"
-                                                                                value="@modifierGroup.Id">
-                                                                            @modifierGroup.Name
-                                                                        </label>
-                                                                    </li>
-                                                                }
+                                                            <ul class="dropdown-menu w-100" id="modifierDropdownForEditList" aria-labelledby="modifierDropdownForEdit">
+                                                                <!-- Dropdown content will be dynamically loaded here -->
                                                             </ul>
                                                             <input type="hidden" id="ModifierGroupIds"
                                                             name="ModifierGroupIds">

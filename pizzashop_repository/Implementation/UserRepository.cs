@@ -24,7 +24,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error getting user by emial", ex);
+            throw new Exception("Error getting user by emial", ex);
         }
 
     }
@@ -37,7 +37,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error geting user by name", ex);
+            throw new Exception("Error geting user by name", ex);
         }
     }
 
@@ -49,7 +49,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error getting user", ex);
+            throw new Exception("Error getting user", ex);
         }
 
     }
@@ -65,7 +65,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Failed To Update User", ex);
+            throw new Exception("Failed To Update User", ex);
         }
     }
 
@@ -77,7 +77,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Failed to get user role", ex);
+            throw new Exception("Failed to get user role", ex);
         }
     }
 
@@ -91,7 +91,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Failed to get user email and role", ex);
+            throw new Exception("Failed to get user email and role", ex);
         }
 
     }
@@ -109,7 +109,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Failed to get users from database", ex);
+            throw new Exception("Failed to get users from database", ex);
         }
     }
 
@@ -121,7 +121,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the user by id.", ex);
+            throw new Exception("An error occurred while retrieving the user by id.", ex);
         }
     }
 
@@ -136,7 +136,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("Error in Deleting User", ex);
+            throw new Exception("Error in Deleting User", ex);
         }
     }
 
@@ -148,7 +148,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the roles.", ex);
+            throw new Exception("An error occurred while retrieving the roles.", ex);
         }
     }
 
@@ -166,7 +166,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the role by ID.", ex);
+            throw new Exception("An error occurred while retrieving the role by ID.", ex);
         }
     }
 
@@ -179,7 +179,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while adding the user.", ex);
+            throw new Exception("An error occurred while adding the user.", ex);
         }
     }
 
@@ -191,7 +191,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving the user by ID and role.", ex);
+            throw new Exception("An error occurred while retrieving the user by ID and role.", ex);
         }
     }
 
@@ -202,9 +202,9 @@ public class UserRepository : IUserRepository
         {
             return await _context.Roles.FirstOrDefaultAsync(r => r.Rolename == roleName);
         }
-        catch (Exception ex)
+        catch
         {
-            throw new ApplicationException("An error occurred while retrieving the role by name.", ex);
+            throw;
         }
     }
 
@@ -218,7 +218,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving permissions by role ID.", ex);
+            throw new Exception("An error occurred while retrieving permissions by role ID.", ex);
         }
     }
 
@@ -232,7 +232,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while retrieving role permission by role name and permission id.", ex);
+            throw new Exception("An error occurred while retrieving role permission by role name and permission id.", ex);
         }
     }
 
@@ -245,7 +245,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An error occurred while updating the role permission.", ex);
+            throw new Exception("An error occurred while updating the role permission.", ex);
         }
     }
 }
